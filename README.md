@@ -48,6 +48,16 @@ A Telegram bot created with Node.js and TypeScript that integrates with OpenAI A
    }
    ```
 
+8. Admin UI credentials (accessible at http://localhost:3000):
+   - By default, the admin UI uses these credentials:
+     - Username: admin
+     - Password: password123
+   - You can change these in the `.env` file:
+   ```
+   ADMIN_USERNAME=your_admin_username
+   ADMIN_PASSWORD=your_secure_password
+   ```
+
 ## Development
 
 Run the bot in development mode with hot reloading:
@@ -76,6 +86,8 @@ pnpm start
 - MongoDB integration for user and lead data storage
 - User message statistics tracking
 - Lead information collection and storage
+- Web-based admin UI for lead management
+- Lead status tracking (new, contacted, callback, completed, not interested)
 - TypeScript support
 - Hot reloading during development
 - Scalable architecture with separation of concerns
@@ -92,6 +104,7 @@ src/
   │   ├── message.service.ts   # Message processing
   │   ├── telegram.service.ts  # Telegram bot management
   │   ├── db.service.ts        # Database connection management
+  │   ├── lead.service.ts      # Lead management service
   │   └── user.service.ts      # User data management
   ├── models/          # MongoDB models
   │   ├── user.model.ts        # User data schema
@@ -101,6 +114,14 @@ src/
   ├── utils/           # Utility functions
   │   └── logger.ts    # Enhanced logging utility
   ├── types/           # TypeScript type definitions
+  ├── web/             # Web interface for lead management
+  │   ├── server.ts           # Express server
+  │   ├── views/              # EJS templates
+  │   │   ├── dashboard.ejs   # Leads listing page
+  │   │   ├── lead-details.ejs # Lead detail view
+  │   │   ├── login.ejs       # Admin login page
+  │   │   └── partials/       # Reusable template parts
+  │   └── public/             # Static assets
   └── index.ts         # Application entry point
 ```
 

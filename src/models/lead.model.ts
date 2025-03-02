@@ -12,6 +12,15 @@ interface ILeadModel extends Model<ILead> {
       additionalInfo?: Record<string, any>;
     }
   ): Promise<ILead>;
+  
+  updateLeadStatus(
+    leadId: mongoose.Types.ObjectId | string,
+    status: 'new' | 'contacted' | 'callback' | 'completed' | 'not_interested',
+    data?: {
+      callbackDate?: Date;
+      notes?: string;
+    }
+  ): Promise<ILead | null>;
 }
 
 export interface ILead extends Document {
@@ -21,7 +30,11 @@ export interface ILead extends Document {
   email: string;
   phoneNumber: string;
   source: string;
+  status: 'new' | 'contacted' | 'callback' | 'completed' | 'not_interested';
+  callbackDate?: Date;
+  notes?: string;
   createdAt: Date;
+  updatedAt: Date;
   additionalInfo?: Record<string, any>;
 }
 
@@ -55,6 +68,18 @@ const LeadSchema: Schema = new Schema(
       type: String,
       default: 'telegram_bot',
     },
+    status: {
+      type: String,
+      enum: ['new', 'contacted', 'callback', 'completed', 'not_interested'],
+      default: 'new',
+      index: true
+    },
+    callbackDate: {
+      type: Date,
+    },
+    notes: {
+      type: String,
+    },
     additionalInfo: {
       type: Schema.Types.Mixed,
       default: {},
@@ -86,9 +111,38 @@ LeadSchema.statics.createLead = async function(
     name: leadData.name,
     email: leadData.email,
     phoneNumber: leadData.phoneNumber,
+    status: 'new',
     additionalInfo: leadData.additionalInfo || {},
     createdAt: new Date(),
   });
+};
+
+// Update lead status
+LeadSchema.statics.updateLeadStatus = async function(
+  leadId: mongoose.Types.ObjectId | string,
+  status: 'new' | 'contacted' | 'callback' | 'completed' | 'not_interested',
+  data?: {
+    callbackDate?: Date;
+    notes?: string;
+  }
+): Promise<ILead | null> {
+  const updateData: any = { status };
+  
+  if (data) {
+    if (data.callbackDate) {
+      updateData.callbackDate = data.callbackDate;
+    }
+    
+    if (data.notes) {
+      updateData.notes = data.notes;
+    }
+  }
+  
+  return this.findByIdAndUpdate(
+    leadId,
+    { $set: updateData },
+    { new: true }
+  );
 };
 
 export const Lead = mongoose.model<ILead, ILeadModel>('Lead', LeadSchema);

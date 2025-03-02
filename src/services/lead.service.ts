@@ -60,6 +60,96 @@ export class LeadService {
       return [];
     }
   }
+  
+  /**
+   * Get all leads with pagination and filtering
+   */
+  public async getAllLeads(
+    options: {
+      page?: number;
+      limit?: number;
+      status?: string;
+      searchTerm?: string;
+    } = {}
+  ): Promise<{ leads: ILead[]; total: number; pages: number }> {
+    try {
+      const page = options.page || 1;
+      const limit = options.limit || 10;
+      const skip = (page - 1) * limit;
+      
+      const query: any = {};
+      
+      // Apply status filter if provided
+      if (options.status && options.status !== 'all') {
+        query.status = options.status;
+      }
+      
+      // Apply search term if provided
+      if (options.searchTerm) {
+        const searchRegex = new RegExp(options.searchTerm, 'i');
+        query.$or = [
+          { name: searchRegex },
+          { email: searchRegex },
+          { phoneNumber: searchRegex },
+          { notes: searchRegex }
+        ];
+      }
+      
+      const [leads, total] = await Promise.all([
+        Lead.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit),
+        Lead.countDocuments(query)
+      ]);
+      
+      const pages = Math.ceil(total / limit);
+      
+      return {
+        leads,
+        total,
+        pages
+      };
+    } catch (error) {
+      logger.error('Failed to get all leads', error);
+      return {
+        leads: [],
+        total: 0,
+        pages: 0
+      };
+    }
+  }
+  
+  /**
+   * Get a lead by ID
+   */
+  public async getLeadById(leadId: string): Promise<ILead | null> {
+    try {
+      return await Lead.findById(leadId);
+    } catch (error) {
+      logger.error(`Failed to get lead with ID ${leadId}`, error);
+      return null;
+    }
+  }
+  
+  /**
+   * Update lead status
+   */
+  public async updateLeadStatus(
+    leadId: string,
+    status: 'new' | 'contacted' | 'callback' | 'completed' | 'not_interested',
+    data?: {
+      callbackDate?: Date;
+      notes?: string;
+    }
+  ): Promise<ILead | null> {
+    try {
+      return await Lead.updateLeadStatus(leadId, status, data);
+    } catch (error) {
+      logger.error(`Failed to update lead status for ID ${leadId}`, error);
+      return null;
+    }
+  }
 
   /**
    * Check if a valid email format

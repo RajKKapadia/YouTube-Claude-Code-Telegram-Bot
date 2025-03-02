@@ -1,10 +1,9 @@
-import { TelegramService } from './services/telegram.service';
-import { DatabaseService } from './services/db.service'; 
-import { logger } from './utils/logger';
-import WebServer from './web/server';
+import { DatabaseService } from '../services/db.service';
+import { logger } from '../utils/logger';
+import WebServer from './server';
 
 /**
- * Main function to start the application
+ * Main function to start the web server in standalone mode
  */
 async function main() {
   try {
@@ -13,34 +12,30 @@ async function main() {
     const dbService = DatabaseService.getInstance();
     await dbService.connect();
     
-    // Create and start telegram service
-    const telegramService = new TelegramService();
-    await telegramService.start();
-    
     // Start the web server for lead management
-    logger.info('Starting the web server...')
+    logger.info('Starting the web server in standalone mode...')
     const webServer = new WebServer();
     await webServer.start();
     
-    logger.info('Application is running');
+    logger.info('Web server is running');
     
     // Handle graceful shutdown
     process.once('SIGINT', async () => {
-      logger.info('Shutting down application');
+      logger.info('Shutting down web server');
       await dbService.disconnect();
       process.exit(0);
     });
     
     process.once('SIGTERM', async () => {
-      logger.info('Shutting down application');
+      logger.info('Shutting down web server');
       await dbService.disconnect();
       process.exit(0);
     });
   } catch (error) {
-    logger.error('Application failed to start', error);
+    logger.error('Web server failed to start', error);
     process.exit(1);
   }
 }
 
-// Start the application
+// Start the web server
 main();
