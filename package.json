@@ -1,0 +1,37 @@
+{
+  "name": "youtube-claude-code-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot created with Node.js and TypeScript",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon",
+    "lint": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "nodejs",
+    "typescript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "mongoose": "^8.11.0",
+    "openai": "^4.86.1",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  }
+}
